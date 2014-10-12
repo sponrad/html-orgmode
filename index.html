@@ -1,0 +1,222 @@
+ <html>
+
+   <head>
+
+     <style>
+      html, body, p, div, form, textarea {
+	margin: 0;
+	padding: 0;
+	border: none;
+	font-family: Arial;
+	font-size: 16px;
+	color: black;
+	outline: 0;
+	cursor: default;
+      }
+
+      textarea, textarea.active {
+	background-color: #ccf;
+	resize: none;
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	cursor: text;
+      }
+      
+      .active {
+	background-color: yellow;
+       }
+      
+      span.done {
+	color: green;
+      }
+       
+      span.todo {
+	color: red;
+      }
+      
+      p.one {
+	color: blue;
+      }
+      p.two {
+	color: brown;
+      }
+      p.three {
+	color: purple;
+      }
+      p.four {
+	color: gray;
+      }
+     </style>
+
+   </head>
+
+   <body>
+     <h1>Daypage Org-mode</h1>
+     
+     <small>
+       k, j: up, down<br>
+       Enter: edit<br>
+       o: insert new<br>
+       dd: delete selected<br>
+       escape: return to select mode<br>
+       t: toggle todo/done/none<br>
+     </small>
+     <br><br>
+
+     <div id="crib">
+       <p class="autogrow">* This is where it is at</p>
+       <p class="autogrow">this is where you would type the stuff of the header</p>
+       <p class="autogrow">** TODO this is a sub item todo</p>
+       <p class="autogrow">** This is a sub line</p>
+       <p class="autogrow">* Another header</p>
+       <p class="autogrow">* TODO Something is todo over here</p>
+       <p class="autogrow">** DONE Some other task that is complete</p>
+       <p class="autogrow">*** DONE Some other task that is complete</p>
+       <p class="autogrow">**** DONE Some other task that is complete</p>
+       <p class="autogrow">df</p>
+     </div>
+
+     <script src="jquery.min.js"  type="text/javascript"></script>
+     <script src="keymaster.js"  type="text/javascript"></script>
+     <script src="jeditable.js" type="text/javascript"></script>
+     <script src="jeditable.autogrow.js" type="text/javascript" ></script>
+     <script src="jquery.autogrow.js" type="text/javascript" ></script>
+
+     <script type="text/javascript">
+       $(document).ready( function(){
+
+	function auto() {
+	  $(".autogrow").editable("/savepath", { 
+            type      : "autogrow",
+            tooltip   : "Dbl Click or enter to edit",
+            onblur    : "cancel", //ignore submit
+	    event     : "dblclick",
+            autogrow : {
+              lineHeight : 16,
+              minHeight  : 16
+            }
+	  });
+	  
+
+	  //apply syntax
+	  $('#crib').children().each( function(index){
+	    if ($(this).html().slice(0,4) == "****"){
+	      $(this).addClass("four").removeClass("three").removeClass("two").removeClass("one");
+	    }
+	    else if ($(this).html().slice(0,3) == "***"){
+	      $(this).removeClass("four").addClass("three").removeClass("two").removeClass("one");
+	    }
+	    else if ($(this).html().slice(0,2) == "**"){
+	      $(this).removeClass("four").removeClass("three").addClass("two").removeClass("one");
+	    }
+	    else if ($(this).html().slice(0,1) == "*"){
+	      $(this).removeClass("four").removeClass("three").removeClass("two").addClass("one");
+	    }
+
+	    $(this).html($(this).html().replace("TODO", "<span class='todo'>TODO</span>"));
+	    $(this).html($(this).html().replace("DONE", "<span class='done'>DONE</span>"));
+	  });
+	  
+	}
+
+	$('#crib').children().first().addClass("active");	
+
+	auto();
+	
+	mode = "command";
+
+	$("#crib p").on("click", function(e){
+	  cur = $('#crib p.active')
+	  if (cur != $(e.target)){
+	    cur.removeClass("active");
+	    $(e.target).addClass("active");
+	  }
+	});
+	
+	key("down, j", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  if (!cur.is(':last-child')){
+	    cur.removeClass("active").next().addClass("active");
+	  }
+	});
+
+	key("up, k", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  if (!cur.is(':first-child')){
+	    cur.removeClass("active").prev().addClass("active");
+	  }
+	});
+
+	key("enter", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  cur.dblclick();
+	  mode = "input";
+	});
+
+	key("o", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  cur.removeClass("active").after('<p class="active autogrow">*</p>');
+	  auto();
+	  cur.after().click();
+	});
+
+	var dbld = 0;
+	var timer;
+	key("d", function(e){
+	  e.preventDefault();
+	  if (dbld != 0) {
+	    console.log("Ok double d");
+	    timer = 0;
+	    cur = $('#crib p.active');
+	    if (!cur.is(':last-child')){
+	      cur.next().addClass("active");
+	    }
+	    else{
+	      cur.prev().addClass("active");
+	    }
+	    cur.remove();
+	  } else {
+	    timer = setTimeout(function(){dbld = 0; console.log("it is 0"); }, 500);
+	    dbld = 1;
+	  }
+	});  //end key o
+
+	key("alt+right", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  
+	  if (cur.html().slice(0,4) != "****"){
+	    cur.html( "*" + cur.html() );
+	  }
+	  
+	  auto();
+	});
+
+	key("alt+left", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  if (cur.html().slice(0,1) == "*"){
+	    cur.html( cur.html().slice(1,-1) );
+	  }
+	  auto();
+	});
+
+	key("t", function(e){
+	  e.preventDefault();
+	  cur = $('#crib p.active');
+	  
+	  cur.html( "TODO " + cur.html() );
+
+	  
+	  auto();
+	});
+
+      });
+     </script>
+   </body>
+ </html>
