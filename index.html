@@ -65,16 +65,16 @@
      <br><br>
 
      <div id="crib">
-       <p class="autogrow">* This is where it is at</p>
-       <p class="autogrow">this is where you would type the stuff of the header</p>
-       <p class="autogrow">** TODO this is a sub item todo</p>
-       <p class="autogrow">** This is a sub line</p>
-       <p class="autogrow">* Another header</p>
-       <p class="autogrow">* TODO Something is todo over here</p>
-       <p class="autogrow">** DONE Some other task that is complete</p>
-       <p class="autogrow">*** DONE Some other task that is complete</p>
-       <p class="autogrow">**** DONE Some other task that is complete</p>
-       <p class="autogrow">df</p>
+       <p class="autogrow" contenteditable>* This is where it is at</p>
+       <p class="autogrow" contenteditable>this is where you would type the stuff of the header</p>
+       <p class="autogrow" contenteditable>** TODO this is a sub item todo</p>
+       <p class="autogrow" contenteditable>** This is a sub line</p>
+       <p class="autogrow" contenteditable>* Another header</p>
+       <p class="autogrow" contenteditable>* TODO Something is todo over here</p>
+       <p class="autogrow" contenteditable>** DONE Some other task that is complete</p>
+       <p class="autogrow" contenteditable>*** DONE Some other task that is complete</p>
+       <p class="autogrow" contenteditable>**** DONE Some other task that is complete</p>
+       <p class="autogrow" contenteditable>df</p>
      </div>
 
      <script src="jquery.min.js"  type="text/javascript"></script>
@@ -160,7 +160,7 @@
 	key("o", function(e){
 	  e.preventDefault();
 	  cur = $('#crib p.active');
-	  cur.removeClass("active").after('<p class="active autogrow">*</p>');
+	  cur.removeClass("active").after('<p class="active autogrow" contenteditable>*</p>');
 	  auto();
 	  cur.after().click();
 	});
